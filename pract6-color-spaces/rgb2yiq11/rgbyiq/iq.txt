@@ -1,0 +1,104 @@
+clear all;
+clc;
+a=imread('test.jpg');
+a=double(a);
+[row col dim]=size(a);
+
+red=a(:,:,1);
+green=a(:,:,2);
+blue=a(:,:,3);
+
+%	Compute histogram for R,G,B components and store it in arrays
+
+rh=zeros(1,256);
+gh=zeros(1,256);
+bh=zeros(1,256);
+for i=1:row
+    for j=1:col
+        rh(1,(red(i,j)+1))=rh(1,(red(i,j)+1))+1;
+        gh(1,(red(i,j)+1))=gh(1,(green(i,j)+1))+1;
+        bh(1,(red(i,j)+1))=bh(1,(blue(i,j)+1))+1;
+        
+    end
+end
+
+  
+%	Convert RGB to YIQ  (HSI) using above equations 
+
+Y=red*0.299+green*0.587+blue*0.114;
+I=red*0.596+green*(-0.2875)+blue*(-0.321);
+Q=red*0.212+green*(-0.523)+blue*0.311;
+
+%Y=floor(Y);
+%I=floor(I);
+%Q=floor(Q);
+
+% 	Display R, G, B images and corresponding histograms
+g=1:1:256;
+
+figure(1) 
+subplot(3,2,1)
+imshow(uint8(red));
+title('red component');
+subplot(3,2,2)
+stem(g,rh);
+xlabel('Gray Scale levels');
+ylabel('Number of Pixels');
+title('Histogram of image');
+grid on;
+
+subplot(3,2,3)
+imshow(uint8(green));
+title('green component');
+subplot(3,2,4)
+stem(g,gh);
+xlabel('Gray Scale levels');
+ylabel('Number of Pixels');
+title('Histogram of image');
+grid on;
+
+subplot(3,2,5)
+imshow(uint8(blue));
+title('blue component');
+subplot(3,2,6)
+stem(g,bh);
+xlabel('Gray Scale levels');
+ylabel('Number of Pixels');
+title('Histogram of image');
+grid on;
+
+%	Display Y, I, Q images (H, S, I images) and corresponding histograms
+ yh=zeros(1,256);
+ 
+ for i=1:row
+    for j=1:col
+        yh(1,(floor(Y(i,j))+1))=yh(1,(floor(Y(i,j))+1))+1;   
+    end
+end
+
+ g=1:1:256; 
+
+figure(2) 
+subplot(1,2,1)
+imagesc(Y);
+title(' y component');
+colormap(gray);
+subplot(1,2,2)
+stem(g,yh);
+xlabel('Gray Scale levels');
+ylabel('Number of Pixels');
+title('Histogram of image');
+grid on;
+
+ 
+
+
+ %	Convert YIQ back to RGB
+red1=Y*1+I*0.956+Q*0.621;
+green1=Y*1+I*(-0.272)+Q*(-0.647);
+blue1=Y*1+I*(-0.106)+Q*1.703;
+
+rgb=cat(3,red1,green1,blue1);
+figure(3)
+imshow(uint8(rgb));
+title('rgb converted from yiq image');

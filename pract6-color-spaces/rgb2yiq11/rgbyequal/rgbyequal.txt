@@ -1,0 +1,91 @@
+clear all;
+clc;
+a=imread('test.jpg');
+a=double(a);
+[row col dim]=size(a);
+
+red=a(:,:,1);
+green=a(:,:,2);
+blue=a(:,:,3);
+
+ m=row;
+ n=col;
+  
+%	Convert RGB to YIQ  (HSI) using above equations 
+
+Y=red*0.299+green*0.587+blue*0.114;
+I=red*0.596+green*(-0.2875)+blue*(-0.321);
+Q=red*0.212+green*(-0.523)+blue*0.311;
+
+ Y1=floor(Y);
+
+ %	Compute histogram for Y i.e. luminance component and store it in an array. 
+ yh=zeros(1,256);
+ 
+ for i=1:row
+    for j=1:col
+        yh(1,(floor(Y1(i,j))+1))=yh(1,(floor(Y1(i,j))+1))+1;   
+    end
+ end
+
+ 
+ 
+ %	Apply histogram equalization algorithm on Y i.e. luminance component and store it in an array
+ys(1)=yh(1,1);
+for i=2:256
+    ys(i)=ys(i-1)+yh(1,i);
+end
+
+rgn=zeros(256);
+for i=1:256
+    yf(i)=(ys(i)*255)/(m*n);
+    ygn(i)=floor(yf(i));
+end
+
+yGn=zeros(m,n);
+for i=1:m
+    for j=1:n
+        for k=1:256
+            if((Y1(i,j)+1)==k)
+                yGn(i,j)=ygn(k);
+            end
+        end
+    end
+end
+
+yhe=zeros(1,256);
+ 
+for i=1:row
+    for j=1:col
+        yhe(1,(yGn(i,j)+1))=yhe(1,(yGn(i,j)+1))+1;
+    end
+end
+ %	Convert YIQ back to RGB
+red1=yGn*1+I*0.956+Q*0.621;
+green1=yGn*1+I*(-0.272)+Q*(-0.647);
+blue1=yGn*1+I*(-0.106)+Q*1.703;
+
+
+%	Display the original Y component histogram and equalized Y histogram
+g=1:1:256;
+figure(1)
+subplot(1,2,1)
+stem(g,yh);
+xlabel('Gray Scale levels');
+ylabel('Number of Pixels');
+title('  Histogram of y component');
+grid on;
+
+subplot(1,2,2)
+stem(g,yhe);
+xlabel('Gray Scale levels');
+ylabel('Number of Pixels');
+title('Equalized Histogram of y component');
+grid on;
+ 
+
+%	Display the equalized RGB colour image.
+rgb=cat(3,red1,green1,blue1);
+figure(3)
+imshow(uint8(rgb));
+title('rgb equalized converted from yiq image');

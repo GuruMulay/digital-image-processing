@@ -1,0 +1,159 @@
+% RGB his equalization
+clear all;
+clc;
+%	Read R,G,B components from a “.bmp” and store them in separate files.
+a=imread('test.jpg');
+a=double(a);
+[row col dim]=size(a);
+m=row;
+n=col;
+red=a(:,:,1);
+green=a(:,:,2);
+blue=a(:,:,3);
+rG=red;
+gG=green;
+bG=blue;
+
+%	Compute histogram for R,G, B components and store it in arrays.
+
+rh=zeros(1,256);
+gh=zeros(1,256);
+bh=zeros(1,256);
+for i=1:row
+    for j=1:col
+        rh(1,(red(i,j)+1))=rh(1,(red(i,j)+1))+1;
+        gh(1,(green(i,j)+1))=gh(1,(green(i,j)+1))+1;
+        bh(1,(blue(i,j)+1))=bh(1,(blue(i,j)+1))+1;
+        
+    end
+end
+
+%	Apply histogram equalization algorithm on R, G, B histograms.
+%red
+rs(1)=rh(1,1);
+for i=2:256
+    rs(i)=rs(i-1)+rh(1,i);
+end
+
+rgn=zeros(256);
+for i=1:256
+    rf(i)=(rs(i)*255)/(m*n);
+    rgn(i)=floor(rf(i));
+end
+
+rGn=zeros(m,n);
+for i=1:m
+    for j=1:n
+        for k=1:256
+            if((rG(i,j)+1)==k)
+                rGn(i,j)=rgn(k);
+            end
+        end
+    end
+end
+%green
+gs(1)=gh(1,1);
+for i=2:256
+    gs(i)=gs(i-1)+gh(1,i);
+end
+
+ggn=zeros(256);
+for i=1:256
+    gf(i)=(gs(i)*255)/(m*n);
+    ggn(i)=floor(rf(i));
+end
+
+gGn=zeros(m,n);
+for i=1:m
+    for j=1:n
+        for k=1:256
+            if((gG(i,j)+1)==k)
+                gGn(i,j)=ggn(k);
+            end
+        end
+    end
+end
+%blue
+bs(1)=bh(1,1);
+for i=2:256
+    bs(i)=bs(i-1)+bh(1,i);
+end
+
+bgn=zeros(256);
+for i=1:256
+    bf(i)=(bs(i)*255)/(m*n);
+    bgn(i)=floor(bf(i));
+end
+
+bGn=zeros(m,n);
+for i=1:m
+    for j=1:n
+        for k=1:256
+            if((bG(i,j)+1)==k)
+                bGn(i,j)=bgn(k);
+            end
+        end
+    end
+end
+
+rhe=zeros(1,256);
+ghe=zeros(1,256);
+bhe=zeros(1,256);
+for i=1:row
+    for j=1:col
+        rhe(1,(rGn(i,j)+1))=rhe(1,(rGn(i,j)+1))+1;
+        ghe(1,(gGn(i,j)+1))=ghe(1,(gGn(i,j)+1))+1;
+        bhe(1,(bGn(i,j)+1))=bhe(1,(bGn(i,j)+1))+1;
+        
+    end
+end
+g=1:1:256;
+%.	Display the three (R, G, B) original histograms and three equalized histograms.
+figure(1)
+subplot(3,2,1)
+stem(g,rh);
+xlabel('Gray Scale levels');
+ylabel('Number of Pixels');
+title('  Histogram of red component');
+grid on;
+subplot(3,2,2)
+stem(g,rhe);
+xlabel('Gray Scale levels');
+ylabel('Number of Pixels');
+title('Equalized Histogram of red component');
+grid on;
+subplot(3,2,3)
+stem(g,gh);
+xlabel('Gray Scale levels');
+ylabel('Number of Pixels');
+title('Histogram of green component');
+grid on;
+subplot(3,2,4)
+stem(g,ghe);
+xlabel('Gray Scale levels');
+ylabel('Number of Pixels');
+title('Equalized Histogram of green component');
+grid on;
+subplot(3,2,5)
+stem(g,bh);
+xlabel('Gray Scale levels');
+ylabel('Number of Pixels');
+title('  Histogram of blue component');
+grid on;
+subplot(3,2,6)
+stem(g,bhe);
+xlabel('Gray Scale levels');
+ylabel('Number of Pixels');
+title('Equalized Histogram of blue component');
+grid on;
+
+
+%	Display the equalized colour image.
+imgeq=cat(3,rGn,bGn,bGn);
+figure(2)
+
+imshow(uint8(imgeq));
+title('  equalized rgb image');
+figure(3)
+imshow(uint8(a));
+title('  original rgb image');
