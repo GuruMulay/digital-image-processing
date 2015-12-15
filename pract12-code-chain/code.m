@@ -1,0 +1,127 @@
+clc;
+clear;
+I=[zeros(2,10);zeros(1,2),ones(1,6),zeros(1,2);zeros(5,2),ones(5,1),zeros(5,4),ones(5,1),zeros(5,2);zeros(1,2),ones(1,6),zeros(1,2);zeros(2,10)];
+figure(1); 
+imshow(I); 
+title('Original image to be chain coded');
+s=sum(sum(I));
+[m,n]=size(I);
+p=m*n;
+
+x=0;
+y=0;
+flag=1;
+for i=1:m
+    for j=1:n
+        if I(i,j)==1
+            x=i;
+            y=j;       
+            flag=0;
+            break;
+        end
+    end
+   if (flag==0)
+       break;
+   end
+end
+x;
+y;
+k=1;
+
+z=zeros(1,s);
+d=1;
+ a=x;
+ b=y;
+ flag1=0;
+while(flag1==0)
+        if (I(a,b)==1)
+            if(I(a,b+1)==1)
+                I(a,b)=0;
+                z(d)=0;
+            d=d+1;
+            b=b+1;
+           
+            I(x,y)=1;
+            elseif (I(a-1,b+1)==1)
+                I(a,b)=0;
+                z(d)=1;
+                d=d+1;
+                a=a-1;
+                b=b+1;
+           
+            elseif (I(a-1,b)==1)
+                I(a,b)=0;
+                z(d)=2;
+                d=d+1;
+                a=a-1;
+                           
+           elseif I(a,b-1)==1
+                I(a,b)=0;
+                z(d)=4;
+                d=d+1;
+                b=b-1;
+            elseif I(a-1,b-1)==1
+                I(a,b)=0;
+                z(d)=3;
+                d=d+1;
+                a=a-1;b=b-1;
+            
+           elseif (I(a+1,b)==1)
+                I(a,b)=0;
+                z(d)=6;
+                d=d+1;
+                a=a+1;
+            
+            
+             elseif I(a+1,b-1)==1
+                I(a,b)=0;
+                z(d)=5;
+                d=d+1;
+                a=a+1;
+                b=b-1;
+
+            else (I(a+1,b+1)==1)
+               I(a,b)=0;
+                z(d)=7;
+               d=d+1;
+               a=a+1;
+               b=b+1; 
+            end      
+        end
+        if (a==x && b==y)
+            flag1=1;
+        end
+end
+ 
+      % reconstruction:
+    
+    Rimg=zeros(11,10);
+    k=x;
+    l=y;
+    Rimg(x,y)=1;
+    [s,t]=size(z);
+    i=1;
+    while(i<t)
+        if z(i)==0
+    Rimg(k,l+1)=1;
+    l=l+1;
+        
+        elseif z(i)==2
+    Rimg(k-1,l)=1;
+    k=k-1;
+        elseif z(i)==4
+            Rimg(k,l-1)=1;
+            l=l-1;
+        elseif z(i)==6
+            Rimg(k+1,l)=1;
+            k=k+1;
+        elseif z(i)==5
+            Rimg(k+1,l-1)=1;
+            k=k+1;
+            l=l-1;
+        end
+      i=i+1;
+    end
+    figure(2);
+    imshow(Rimg);
+    title('Reconstructed image');
