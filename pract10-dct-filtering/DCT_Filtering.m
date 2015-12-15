@@ -1,0 +1,258 @@
+clc;
+clear all; 
+close all;
+
+% Read and Display the Image
+imgrgb = imread('C:\Users\Public\Pictures\Sample Pictures\Sample5.jpg');
+image = rgb2gray(imgrgb);
+image=imresize(image,[216 216]);
+figure(1);
+subplot(2,2,[1 2]);
+imshow(image);
+title('Original Image');
+[row,column] = size(image);
+image = double(image);
+image = image - 128*ones(row,column);
+N = 8;
+
+% Divide the Image into NxN Subimages
+num1 = row/N;
+num2 = column/N;
+for i = 1:num1
+    for j = 1:num2
+        subimg{(i-1)*num1+j} = image((i-1)*N+1:(i-1)*N+N,(j-1)*N+1:(j-1)*N+N);
+    end
+end
+
+% Calculate the Cosine Matrix
+alpha(1) = sqrt(1/N);
+alpha(2:N) = sqrt(2/N);
+for u = 0:N-1
+    for x = 0:N-1
+        cosine(u+1,x+1) = alpha(u+1) * cos((2*x+1)*u*pi/(2*N));
+    end
+end
+
+% Calculate DCT
+alphau(1) = sqrt(1/N);
+alphau(2:N) = sqrt(2/N);
+alphav(1) = sqrt(1/N);
+alphav(2:N) = sqrt(2/N);
+for i = 1:num1*num2
+    subimage = subimg{i};
+    % Using the Equation
+    for u = 0:N-1
+        for v = 0:N-1
+            temp(u+1,v+1) = 0;
+            for x = 0:N-1
+                for y = 0:N-1
+                    temp(u+1,v+1) = temp(u+1,v+1) + ...
+                        alphau(u+1)*alphav(v+1)*subimage(x+1,y+1)*...
+                        cos((2*x+1)*u*pi/(2*N))*cos((2*y+1)*v*pi/(2*N));
+                end    
+            end
+        end
+    end
+    dct_eqn{i} = temp;
+    
+    % Using the Cosine Matrix
+    dct_mtx{i} = cosine * subimage * cosine';
+end
+tempp=dct_mtx;
+
+% 2-D Array to 1-D Array Conversion (Zigzag Elements)
+for k = 1:num1*num2
+    array1 = dct_eqn{k};
+    array2 = dct_mtx{k};
+    i = 1;
+    j = 1;
+    n = 1;
+    temp1(n) = array1(i,j);
+    temp2(n) = array2(i,j);
+    n = n + 1;
+    while ((i+j) <= (2*N))
+        if (i==1 && mod(j,2)==1)
+            j = j + 1;
+        elseif (j==1 && mod(i,2)==0)
+            i = i + 1;
+        elseif (mod((i+j),2)==0)
+            i = i - 1;
+            j = j + 1;
+        else
+            i = i + 1;
+            j = j - 1;
+        end
+        if (i>N || j>N)
+            continue;
+        else
+            temp1(n)=array1(i,j);
+            temp2(n)=array2(i,j);
+            n=n+1;
+        end
+    end
+    dct_eqn_1d{k} = temp1;
+    dct_mtx_1d{k} = temp2;
+end
+
+% Filtering
+disp('Types of Filters: ');
+disp(' 1. Low Pass Filter ');
+disp(' 2. High Pass Filter ');
+disp(' 3. Band Pass Filter ');
+ch = input('Enter your choice: ');
+
+switch ch
+    case 1
+        lpf = input('Enter the Number of High Frequency Coefficients to be Truncated: ');
+    case 2
+        hpf = input('Enter the Number of Low Frequency Coefficients to be Truncated: ');
+    case 3
+        lpf = input('Enter the Number of High Frequency Coefficients to be Truncated: ');
+        hpf = input('Enter the Number of Low Frequency Coefficients to be Truncated: ');
+    otherwise
+        disp('Wrong Choice...');
+end
+
+% Low Pass Filtering
+if (ch==1 || ch==3)
+    for i = 1:num1*num2
+        filter1 = dct_eqn_1d{i};
+        filter2 = dct_mtx_1d{i};
+        j = N*N;
+        while (j > (N*N-lpf))
+            filter1(j) = 0;
+            filter2(j) = 0;
+            j = j-1;
+        end
+        dct_eqn_1d{i} = filter1;
+        dct_mtx_1d{i} = filter2;
+    end
+end
+
+% High Pass Filtering
+if (ch==2 || ch==3)
+    for i = 1:num1*num2
+        filter1 = dct_eqn_1d{i};
+        filter2 = dct_mtx_1d{i};
+        j = 1;
+        while (j <= hpf)
+            filter1(j) = 0;
+            filter2(j) = 0;
+            j = j+1;
+        end
+        dct_eqn_1d{i} = filter1;
+        dct_mtx_1d{i} = filter2;
+    end
+end
+
+% 1-D Array to 2-D Array Conversion (Zigzag Elements)
+for k = 1:num1*num2
+    array1 = dct_eqn_1d{k};
+    array2 = dct_mtx_1d{k};
+    array3 = tempp{k};
+    N = 8;
+    i = 1;
+    j = 1;
+    n = 1;
+    tem1(i,j) = array1(n);
+    tem2(i,j) = array2(n);
+    tem3(i,j) = array3(n);
+    n = n + 1;
+    while ((i+j) <= (2*N))
+        if (i==1 && mod(j,2)==1)
+            j = j + 1;
+        elseif (j==1 && mod(i,2)==0)
+            i = i + 1;
+        elseif (mod((i+j),2)==0)
+            i = i - 1;
+            j = j + 1;
+        else
+            i = i + 1;
+            j = j - 1;
+        end
+        if (i>N || j>N)
+            continue;
+        else
+            tem1(i,j) = array1(n);
+            tem2(i,j) = array2(n);
+            tem3(i,j) = array3(n);
+            n = n + 1;
+        end
+    end
+    dct_eqn_filt{k} = tem1;
+    dct_mtx_filt{k} = tem2;
+    dct_mtx_mse{k} = tem3;
+ end
+
+% Calculate IDCT
+alphau(1) = sqrt(1/N);
+alphau(2:N) = sqrt(2/N);
+alphav(1) = sqrt(1/N);
+alphav(2:N) = sqrt(2/N);
+for i = 1:num1*num2
+    sub1 = dct_eqn_filt{i};
+    sub2 = dct_mtx_filt{i};
+    sub3 = dct_mtx_mse{i};
+    % Using the Equation
+    for x = 0:N-1
+        for y = 0:N-1
+            tmp(x+1,y+1) = 0;
+            for u = 0:N-1
+                for v = 0:N-1
+                    tmp(x+1,y+1) = tmp(x+1,y+1) + ...
+                        alphau(u+1)*alphav(v+1)*sub1(u+1,v+1)*...
+                        cos((2*x+1)*u*pi/(2*N))*cos((2*y+1)*v*pi/(2*N));
+                end    
+            end
+        end
+    end
+    idct_eqn_filt{i} = tmp;
+    
+    % Using the Cosine Matrix
+    idct_mtx_filt{i} = cosine' * sub2 * cosine;
+    idct_mtx_mse{i}= cosine' * sub3 *cosine;
+end
+
+% Reconstruct the Image
+for i = 1:num1
+    for j = 1:num2
+        img_eqn_filt((i-1)*N+1:(i-1)*N+N,(j-1)*N+1:(j-1)*N+N) = idct_eqn_filt{(i-1)*num1+j};
+        img_mtx_filt((i-1)*N+1:(i-1)*N+N,(j-1)*N+1:(j-1)*N+N) = idct_mtx_filt{(i-1)*num1+j};
+        img_mtx_mse((i-1)*N+1:(i-1)*N+N,(j-1)*N+1:(j-1)*N+N) = idct_mtx_mse{(i-1)*num1+j};
+    end
+end
+
+img_eqn_filt = img_eqn_filt + 128*ones(row,column);
+img_mtx_filt = img_mtx_filt + 128*ones(row,column);
+img_mtx_mse = img_mtx_mse + 128*ones(row,column);
+
+min1 = min(min(img_eqn_filt));
+min2 = min(min(img_mtx_filt));
+img_eqn_filt = img_eqn_filt - min1*ones(row,column);
+img_mtx_filt = img_mtx_filt - min2*ones(row,column);
+img_eqn_filt = img_eqn_filt * 255 / max(max(img_eqn_filt));
+img_mtx_filt = img_mtx_filt * 255 / max(max(img_mtx_filt));
+img_eqn_filt = uint8(img_eqn_filt);
+img_mtx_filt = uint8(img_mtx_filt);
+
+mse=0;
+for i= i:row
+    for j=1:column
+      mse=mse+((image(i,j)-img_mtx_filt(i,j))^2);
+%       mse=mse+y;
+    end
+end
+mse=sqrt(double(mse));
+mse
+
+
+
+% Display the Reconstructed Images
+figure(1);
+subplot(2,2,3);
+imshow(img_eqn_filt);
+title('Reconstructed Filtered Image: DCT Equation');
+figure(1);
+subplot(2,2,4);
+imshow(img_mtx_filt);
+title('Reconstructed Filtered Image: Cosine Matrix');

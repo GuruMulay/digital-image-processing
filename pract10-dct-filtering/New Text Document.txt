@@ -1,0 +1,10 @@
+Types of Filters: 
+ 1. Low Pass Filter 
+ 2. High Pass Filter 
+ 3. Band Pass Filter 
+Enter your choice: 1
+Enter the Number of High Frequency Coefficients to be Truncated: 30
+
+mse =
+
+  7.1848e+008
