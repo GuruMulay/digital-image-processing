@@ -1,0 +1,40 @@
+clc;
+clear all;
+ 
+a=imread('sample.jpg');
+G=rgb2gray(a);
+[m n]=size(G);
+w=[1 1 1;1 1 1;1 1 1];
+for i=2:m-1
+    for j=2:n-1
+        S=[w(1)*G(i-1,j-1) w(2)*G(i-1,j) w(3)*G(i-1,j+1) w(4)*G(i,j-1) w(5)*G(i,j) w(6)*G(i,j+1) w(7)*G(i+1,j-1) w(8)*G(i+1,j) w(8)*G(i+1,j+1)];
+a1(i,j)=max(S);
+a2(i,j)=min(S);
+    end
+end
+figure(1);
+imshow(G);
+title('Original image');
+figure(2);
+imshow(a1);
+title('Dilation of Original image');
+figure(3);
+imshow(a2);
+title('Errogion Original image');
+ 
+for i=2:m-2
+    for j=2:n-2
+        T=[w(1)*a1(i-1,j-1) w(2)*a1(i-1,j) w(3)*a1(i-1,j+1) w(4)*a1(i,j-1) w(5)*a1(i,j) w(6)*a1(i,j+1) w(7)*a1(i+1,j-1) w(8)*a1(i+1,j) w(8)*a1(i+1,j+1)];
+        U=[w(1)*a2(i-1,j-1) w(2)*a2(i-1,j) w(3)*a2(i-1,j+1) w(4)*a2(i,j-1) w(5)*a2(i,j) w(6)*a2(i,j+1) w(7)*a2(i+1,j-1) w(8)*a2(i+1,j) w(8)*a2(i+1,j+1)];
+a3(i,j)=max(U);
+a4(i,j)=min(T);
+    end
+end
+figure(4);
+imshow(a3);
+title('Opening of Original image');
+figure(5);
+imshow(a4);
+title('Closing Original image');
+ 
+
