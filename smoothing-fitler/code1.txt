@@ -1,0 +1,126 @@
+
+
+smoothing filter code
+---------------------------------------------------------------------
+
+clear all;
+close all;
+clc;
+x=imread('cameraman.tif');
+figure(1)
+imshow(x);
+title('Origional Image');
+ygauss=imnoise(x,'gaussian');
+ysalt=imnoise(x,'salt & pepper');
+x=double(x);
+n=input('Enter the masking size:-');
+[a,b]=size(x);
+for i=1+((n-1)/2):a-((n-1)/2)
+    for j=1+((n-1)/2):b-((n-1)/2)
+        new=x(i-((n-1)/2):i+((n-1)/2),j-((n-1)/2):j+((n-1)/2));
+        avg=sum(sum(new))/(n*n);
+        new_smooth(i,j)=avg;
+    end
+end
+new_smooth=uint8(new_smooth);
+figure(2)
+imshow(new_smooth);
+title('Mean');
+
+for i=1+((n-1)/2):a-((n-1)/2)
+    for j=1+((n-1)/2):b-((n-1)/2)
+         new=x(i-((n-1)/2):i+((n-1)/2),j-((n-1)/2):j+((n-1)/2));
+         new1=new(1,:);
+         for q=2:n
+             new1=[new1 new(q,:)];
+         end
+         snew1=sort(new1);
+         q=size(snew1);
+         pt=snew1((q(2)+1)/2);
+         smooth(i,j)=pt;
+    end
+end
+smooth=uint8(smooth);
+figure(3)
+imshow(smooth);
+title('Median');
+
+
+figure(4)
+imshow(ygauss);
+title('Gauss Noise');
+figure(5)
+imshow(ysalt);
+title('Salt $ Pepper Noise');
+[a,b]=size(ygauss);
+for i=1+((n-1)/2):a-((n-1)/2)
+    for j=1+((n-1)/2):b-((n-1)/2)
+        new=ygauss(i-((n-1)/2):i+((n-1)/2),j-((n-1)/2):j+((n-1)/2));
+        avg=sum(sum(new))/(n*n);
+        new_smooth(i,j)=avg;
+    end
+end
+new_smooth=uint8(new_smooth);
+figure(6)
+imshow(new_smooth);
+title('Gauss Mean');
+
+
+[a,b]=size(ysalt);
+for i=1+((n-1)/2):a-((n-1)/2)
+    for j=1+((n-1)/2):b-((n-1)/2)
+        new=ysalt(i-((n-1)/2):i+((n-1)/2),j-((n-1)/2):j+((n-1)/2));
+        avg=sum(sum(new))/(n*n);
+        new_smooth(i,j)=avg;
+    end
+end
+new_smooth=uint8(new_smooth);
+figure(7)
+imshow(new_smooth);
+title('Salt Mean');
+
+
+[a,b]=size(ygauss);
+for i=1+((n-1)/2):a-((n-1)/2)
+    for j=1+((n-1)/2):b-((n-1)/2)
+         new=ygauss(i-((n-1)/2):i+((n-1)/2),j-((n-1)/2):j+((n-1)/2));
+         new1=new(1,:);
+         for q=2:n
+             new1=[new1 new(q,:)];
+         end
+         snew1=sort(new1);
+         q=size(snew1);
+         pt=snew1((q(2)+1)/2);
+         smooth(i,j)=pt;
+    end
+end
+smooth=uint8(smooth);
+figure(8)
+imshow(smooth);
+title('Gauss Median');
+
+
+[a,b]=size(ysalt);
+for i=1+((n-1)/2):a-((n-1)/2)
+    for j=1+((n-1)/2):b-((n-1)/2)
+         new=ysalt(i-((n-1)/2):i+((n-1)/2),j-((n-1)/2):j+((n-1)/2));
+         new1=new(1,:);
+         for q=2:n
+             new1=[new1 new(q,:)];
+         end
+         snew1=sort(new1);
+         q=size(snew1);
+         pt=snew1((q(2)+1)/2);
+         smooth(i,j)=pt;
+    end
+end
+smooth=uint8(smooth);
+figure(9)
+imshow(smooth);
+title('Salt Median');
+
+
+---------------------------------------------------------------------
+---------------------------------------------------------------------
+
+Enter the masking size:-3

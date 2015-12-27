@@ -1,0 +1,9 @@
+
+mask for high pass:
+
+enter the mask of size 3x3[-1 -1 -1; -1 9 -1; -1 -1 -1]
+
+
+high boost output:
+
+enter the mask of size 3x3[-1 -1 -1; -1 9.5 -1; -1 -1 -1]

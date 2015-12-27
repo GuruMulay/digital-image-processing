@@ -1,0 +1,59 @@
+
+clc;
+clear all;
+a=imread('water lilies.jpg');
+d=rgb2gray(a);
+figure(1)
+imshow(d);
+b=double(d);
+mask=input('enter the mask of size 3x3');
+[m l]=size(b);
+for i=2: (m-1)
+    for j=2:(l-1)
+        new=b(i-1:i+1,j-1:j+1);
+        newval=new.*mask;
+        new_val=sum(sum(newval));
+        imsharp(i,j)=new_val;
+    end
+end
+ figure(2)
+ imshow(uint8(imsharp));
+
+
+offset=min(min(imsharp));
+
+
+for i=2: (m-1)
+    for j=2:(l-1)
+        if offset<0
+            imsharp(i,j)=imsharp(i,j)-offset;
+        end
+   end
+end
+
+top=max(max(imsharp));
+c=256/top;
+
+
+if top>256
+for i=2: (m-1)
+    for j=2:(l-1)
+       imsharp(i,j)=c*imsharp(i,j);
+    end
+end
+end
+
+
+mask for high pass:
+
+enter the mask of size 3x3[-1 -1 -1; -1 9 -1; -1 -1 -1]
+
+
+high boost output:
+
+enter the mask of size 3x3[-1 -1 -1; -1 9.5 -1; -1 -1 -1]
+
+
+figure(3)
+imsharp=uint8(imsharp);
+imshow(imsharp);
