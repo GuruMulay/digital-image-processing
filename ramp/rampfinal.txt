@@ -1,0 +1,39 @@
+=========================================================================
+*                            Final Report                               *
+=========================================================================
+Final Results
+RTL Top Level Output File Name     : ramp1.ngr
+Top Level Output File Name         : ramp1
+Output Format                      : NGC
+Optimization Goal                  : Speed
+Keep Hierarchy                     : NO
+
+Design Statistics
+# IOs                              : 19
+
+Cell Usage :
+# BELS                             : 37
+#      INV                         : 1
+#      LUT2_L                      : 12
+#      MUXCY                       : 11
+#      VCC                         : 1
+#      XORCY                       : 12
+# FlipFlops/Latches                : 12
+#      FDC                         : 12
+# Clock Buffers                    : 1
+#      BUFGP                       : 1
+# IO Buffers                       : 18
+#      IBUF                        : 2
+#      OBUF                        : 16
+=========================================================================
+
+Device utilization summary:
+---------------------------
+
+Selected Device : 3s400pq208-5 
+
+ Number of Slices:                       6  out of   3584     0%  
+ Number of Slice Flip Flops:            12  out of   7168     0%  
+ Number of 4 input LUTs:                12  out of   7168     0%  
+ Number of bonded IOBs:                 19  out of    141    13%  
+ Number of GCLKs:                        1  out of      8    12%  
